@@ -1,0 +1,267 @@
+.dashboard-container {
+  min-height: 100vh;
+  padding: 40px;
+  font-family: "Poppins", sans-serif;
+  animation: fadeIn 1s ease-in-out;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(circle at top, #e6f7ec, #ffffff),
+            url('../assets/images/fondo.png') center/cover no-repeat;
+  background-blend-mode: lighten;
+}
+
+/* ---------- HEADER ---------- */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.header-info {
+  flex: 1;
+  min-width: 250px;
+}
+
+.titulo-panel {
+  color: #21a162;
+  font-weight: 600;
+  font-size: 22px;
+}
+/* LOGO EN CABECERA */
+.logo-title {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-logo {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  /* Eliminamos border-radius y box-shadow */
+  border-radius: 0;
+  box-shadow: none;
+  animation: logoFloat 3s ease-in-out infinite alternate;
+}
+
+
+.bienvenida {
+  color: #666;
+  font-size: 15px;
+}
+
+.logout-btn {
+  background-color: transparent;
+  border: 1px solid #21a162;
+  color: #21a162;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.logout-btn:hover {
+  background-color: #21a162;
+  color: white;
+}
+
+/* ---------- SALDO CARD ---------- */
+.saldo-card {
+  background-color: #fff;
+  border-radius: 14px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.08);
+  padding: 30px;
+  text-align: center;
+  margin-bottom: 30px;
+  animation: slideUp 1s ease;
+}
+
+.saldo-titulo {
+  color: #21a162;
+  font-weight: 600;
+}
+
+.saldo-subtitulo {
+  color: #666;
+}
+
+.saldo-numero {
+  font-size: 72px;
+  color: #21a162;
+  margin: 10px 0;
+}
+
+.saldo-descripcion {
+  color: #555;
+}
+
+/* ---------- ACCIONES ---------- */
+.acciones-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.accion-card {
+  background-color: #fff;
+  border-radius: 14px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.08);
+  padding: 25px;
+  width: 280px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.accion-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
+  background-color: #f8fff9;
+}
+
+.icono {
+  font-size: 42px;
+  color: #21a162;
+  margin-bottom: 10px;
+}
+
+.accion-card h3 {
+  color: #21a162;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.accion-card p {
+  color: #555;
+  font-size: 14px;
+}
+
+/* ---------- SOLICITUDES ---------- */
+.solicitudes-card {
+  background-color: #fff;
+  border-radius: 14px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.solicitud-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f9fff7;
+  border: 1px solid #e3f2ea;
+  border-radius: 10px;
+  padding: 10px 15px;
+  margin-top: 10px;
+}
+
+.solicitud-titulo {
+  color: #21a162;
+  font-weight: 500;
+}
+
+.solicitud-fecha {
+  color: #666;
+  font-size: 13px;
+}
+
+.estado-pendiente {
+  background-color: #fff3cd;
+  color: #856404;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 13px;
+}
+
+/* ---------- ANIMACIONES ---------- */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+
+/* ANIMACIONES */
+@keyframes logoFloat {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0); }
+}
+
+.animate-card {
+  animation: cardFadeIn 0.8s ease forwards;
+  opacity: 0;
+}
+
+@keyframes cardFadeIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 992px) {
+  .dashboard-container {
+    padding: 25px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .logout-btn {
+    align-self: flex-end;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .acciones-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .accion-card {
+    width: 90%;
+  }
+
+  .saldo-numero {
+    font-size: 56px;
+  }
+}
+
+@media (max-width: 480px) {
+  .titulo-panel {
+    font-size: 18px;
+  }
+
+  .saldo-numero {
+    font-size: 48px;
+  }
+
+  .logout-btn {
+    font-size: 14px;
+    padding: 6px 12px;
+  }
+
+  .accion-card {
+    width: 100%;
+  }
+}

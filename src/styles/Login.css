@@ -1,0 +1,205 @@
+/* ======== BASE ======== */
+.login-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f7faf9;
+  overflow: hidden;
+  font-family: "Poppins", sans-serif;
+}
+
+.background-logo {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0.05;
+  z-index: 0;
+}
+
+.background-logo img {
+  width: 80%;
+  max-width: 650px;
+  filter: blur(1px);
+}
+
+.login-box {
+  position: relative;
+  z-index: 1;
+  background: #fff;
+  padding: 2.8rem 2.5rem;
+  border-radius: 18px;
+  width: 90%;
+  max-width: 440px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+.logo {
+  width: 95px;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  font-size: 1.3rem;
+  color: #1a1a1a;
+  margin-bottom: 0.3rem;
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+/* ======== SELECTOR DE ROL ======== */
+.role-selector {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.role-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  border: 1.5px solid #cfd8dc;
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.role-option.active {
+  border-color: #00b074;
+  background-color: #e6f6ee;
+  box-shadow: 0 0 8px rgba(0, 176, 116, 0.25);
+}
+
+.custom-radio {
+  height: 16px;
+  width: 16px;
+  border: 2px solid #999;
+  border-radius: 50%;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.role-option.active .custom-radio {
+  border-color: #00a46b;
+  background-color: #00a46b;
+}
+
+.role-option div strong {
+  color: #1a1a1a;
+  font-size: 0.9rem;
+}
+
+.role-option div p {
+  color: #666;
+  font-size: 0.75rem;
+  margin: 0;
+}
+
+/* ======== FORMULARIO ======== */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  animation: slideUp 0.9s ease-in-out;
+}
+
+.login-form input {
+  padding: 0.85rem;
+  border: 1px solid #cfd8dc;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.login-form input:focus {
+  border-color: #00a46b;
+}
+
+.hint {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 0.2rem;
+}
+
+.login-form button {
+  background-color: #00b074;
+  color: white;
+  border: none;
+  padding: 0.9rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+.login-form button:hover {
+  background-color: #00925f;
+  transform: scale(1.02);
+}
+
+/* ======== ANIMACIONES ======== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ======== RESPONSIVE ======== */
+@media (max-width: 480px) {
+  .login-box {
+    width: 95%;
+    padding: 2rem 1.6rem;
+  }
+
+  .role-selector {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  h1 {
+    font-size: 1.15rem;
+  }
+
+  .role-option div strong {
+    font-size: 0.9rem;
+  }
+
+  .login-form input,
+  .login-form button {
+    font-size: 0.85rem;
+  }
+
+  .background-logo img {
+    max-width: 500px;
+  }
+}
