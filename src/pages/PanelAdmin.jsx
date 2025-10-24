@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AuthorizedList from "../components/AuthorizedList";
 import PendingRequests from "../components/PendingRequests";
 import SummaryCards from "../components/SummaryCards";
@@ -7,6 +8,7 @@ import logo from "../assets/images/comfachoco-logo.png";
 import "../styles/PanelAdmin.css";
 
 function PanelAdmin() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("autorizados");
   const [notifications, setNotifications] = useState(2);
   const [modal, setModal] = useState({ open: false, type: "", message: "" });
@@ -18,6 +20,12 @@ function PanelAdmin() {
     if (type === "delete") message = `Has eliminado el permiso de ${name}.`;
 
     setModal({ open: true, type, message });
+  };
+
+  // Función de logout
+  const handleLogout = () => {
+    // Opcional: limpiar sesión o tokens
+    navigate("/"); // Redirige al login
   };
 
   return (
@@ -51,6 +59,11 @@ function PanelAdmin() {
             </button>
             <button className="notif-btn">
               🔔 {notifications > 0 && <span>{notifications}</span>}
+            </button>
+
+            {/* BOTÓN DE SALIR */}
+            <button className="logout-btn" onClick={handleLogout}>
+              🚪 Salir
             </button>
           </nav>
         </header>

@@ -1,8 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/SolicitarPermisos.css";
 import { FaArrowLeft, FaPaperPlane, FaUpload, FaCheckCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/images/fondo.png";
+
+const diasDisponiblesPorTipo = {
+  Vacaciones: 14,
+  Enfermedad: 30,
+  Maternidad: 126,
+  Paternidad: 11,
+  Otro: 0,
+};
 
 const SolicitarPermisos = () => {
   const navigate = useNavigate();
@@ -13,39 +21,60 @@ const SolicitarPermisos = () => {
   const [comentarios, setComentarios] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [diasSeleccionados, setDiasSeleccionados] = useState(0);
+  const [maxFechaFin, setMaxFechaFin] = useState("");
+
+  // Actualiza días seleccionados cada vez que cambian las fechas
+  useEffect(() => {
+    if (fechaInicio && fechaFin) {
+      const inicio = new Date(fechaInicio);
+      const fin = new Date(fechaFin);
+      const diffTime = fin.getTime() - inicio.getTime();
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+      setDiasSeleccionados(diffDays);
+
+      // Calcula fecha máxima permitida según días disponibles
+      const maxDias = diasDisponiblesPorTipo[tipo];
+      const fechaMax = new Date(inicio);
+      fechaMax.setDate(fechaMax.getDate() + maxDias - 1);
+      setMaxFechaFin(fechaMax.toISOString().split("T")[0]);
+    } else {
+      setDiasSeleccionados(0);
+      setMaxFechaFin("");
+    }
+  }, [fechaInicio, fechaFin, tipo]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (diasSeleccionados > diasDisponiblesPorTipo[tipo]) {
+      alert(`No puedes solicitar más de ${diasDisponiblesPorTipo[tipo]} días para ${tipo}`);
+      return;
+    }
 
-    // Mostrar pantalla de carga
     setLoading(true);
     setSuccess(false);
 
-    // Simulación de envío (esperar 2.5 segundos)
     setTimeout(() => {
       setLoading(false);
       setSuccess(true);
 
-      // ✅ Limpiar todos los campos
       setTipo("Vacaciones");
       setFechaInicio("");
       setFechaFin("");
       setArchivo(null);
       setComentarios("");
+      setDiasSeleccionados(0);
 
-      // Ocultar banner después de 4 segundos
       setTimeout(() => setSuccess(false), 4000);
     }, 2500);
   };
 
   return (
     <div className="solicitar-container">
-      {/* Logo de fondo */}
       <div className="background-logo-container">
         <img src={logo} alt="Logo de fondo" className="background-logo" />
       </div>
 
-      {/* Pantalla de carga */}
       {loading && (
         <div className="overlay-carga">
           <div className="spinner">
@@ -55,7 +84,6 @@ const SolicitarPermisos = () => {
         </div>
       )}
 
-      {/* Banner de éxito */}
       {success && (
         <div className="banner-exito animate-banner">
           <FaCheckCircle className="icono-exito" />
@@ -63,7 +91,6 @@ const SolicitarPermisos = () => {
         </div>
       )}
 
-      {/* Tarjeta del formulario */}
       <div className="formulario-card animate-form">
         <div className="logo-formulario">
           <img src={logo} alt="Logo institucional" />
@@ -83,12 +110,11 @@ const SolicitarPermisos = () => {
           {/* Tipo de Permiso */}
           <label>Tipo de Permiso *</label>
           <select value={tipo} onChange={(e) => setTipo(e.target.value)}>
-            <option>Vacaciones</option>
-            <option>Enfermedad</option>
-            <option>Maternidad</option>
-            <option>Paternidad</option>
-            <option>Otro</option>
+            {Object.keys(diasDisponiblesPorTipo).map((permiso) => (
+              <option key={permiso}>{permiso}</option>
+            ))}
           </select>
+          <small>Días disponibles: {diasDisponiblesPorTipo[tipo]}</small>
 
           {/* Fechas */}
           <div className="fechas-container">
@@ -99,6 +125,7 @@ const SolicitarPermisos = () => {
                 value={fechaInicio}
                 onChange={(e) => setFechaInicio(e.target.value)}
                 required
+                min={new Date().toISOString().split("T")[0]}
               />
             </div>
             <div>
@@ -108,7 +135,14 @@ const SolicitarPermisos = () => {
                 value={fechaFin}
                 onChange={(e) => setFechaFin(e.target.value)}
                 required
+                min={fechaInicio || new Date().toISOString().split("T")[0]}
+                max={maxFechaFin || undefined}
               />
+              {diasSeleccionados > diasDisponiblesPorTipo[tipo] && (
+                <small className="error-text">
+                  ⚠️ Excede los días disponibles ({diasDisponiblesPorTipo[tipo]})
+                </small>
+              )}
             </div>
           </div>
 
