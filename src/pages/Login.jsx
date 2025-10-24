@@ -9,7 +9,13 @@ function Login() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    navigate("/dashboard"); // redirige al dashboard
+
+    // Redirección condicional según el tipo de usuario
+    if (userType === "admin") {
+      navigate("/panel-admin"); // ✅ supervisor
+    } else {
+      navigate("/dashboard"); // ✅ persona normal
+    }
   };
 
   return (

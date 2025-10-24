@@ -1,0 +1,158 @@
+.pending-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+/* Tarjetas */
+.pending-card {
+  background: #ffffffcc;
+  border-left: 6px solid #21a162;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  backdrop-filter: blur(6px);
+}
+
+.pending-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+/* Header */
+.pending-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.pending-info {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.pending-icon {
+  font-size: 2rem;
+  background: #21a16220;
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+.pending-info h4 {
+  margin: 0;
+  color: #17824f;
+  font-size: 1.1rem;
+}
+
+.pending-info small {
+  color: #555;
+  font-size: 0.85rem;
+}
+
+/* Body */
+.pending-body p {
+  margin: 0.3rem 0;
+  color: #333;
+}
+
+.pending-body a {
+  color: #21a162;
+  text-decoration: none;
+}
+
+.pending-body a:hover {
+  text-decoration: underline;
+}
+
+/* Botones */
+.pending-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.pending-actions button {
+  flex: 1;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.3s;
+}
+
+.pending-actions button:hover {
+  transform: translateY(-2px);
+}
+
+.pending-approve {
+  background: #21a162;
+  color: white;
+}
+
+.pending-approve:hover {
+  background: #17824f;
+}
+
+.pending-reject {
+  background: #ff4c4c;
+  color: white;
+}
+
+.pending-reject:hover {
+  background: #d83b3b;
+}
+
+.pending-delete {
+  background: #999;
+  color: white;
+}
+
+.pending-delete:hover {
+  background: #666;
+}
+
+/* Estados */
+.pending-card.aprobado {
+  border-left-color: #21a162;
+  animation: fadeInGreen 0.5s ease;
+}
+
+.pending-card.rechazado {
+  border-left-color: #e63946;
+  animation: fadeInRed 0.5s ease;
+}
+
+.pending-card.eliminado {
+  border-left-color: #555;
+  opacity: 0.6;
+  animation: fadeOut 0.5s ease;
+}
+
+/* Animaciones */
+@keyframes fadeInGreen {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInRed {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.9); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .pending-actions {
+    flex-direction: column;
+  }
+}

@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import SolicitarPermisos from "./pages/SolicitarPermisos";
 import VerMisPermisos from "./pages/VerMisPermisos";
 import CalendarioEquipo from "./pages/CalendarioEquipo";
+import PanelAdmin from "./pages/PanelAdmin"; // ✅ importamos el panel
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/solicitar-permisos" element={<SolicitarPermisos />} />
         <Route path="/ver-mis-permisos" element={<VerMisPermisos />} />
         <Route path="/ver-calendario" element={<CalendarioEquipo />} />
+        <Route path="/panel-admin" element={<PanelAdmin />} /> {/* ✅ nueva ruta */}
       </Routes>
     </Router>
   );
