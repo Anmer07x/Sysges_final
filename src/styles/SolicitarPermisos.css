@@ -214,14 +214,12 @@ textarea {
   font-weight: 600;
 }
 
-/* ======================= BANNER ÉXITO ======================= */
-.banner-exito {
+/* ======================= BANNERS DE ESTADO ======================= */
+.banner-exito, .banner-error {
   position: fixed;
   top: 25px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #21a162;
-  color: #fff;
   padding: 15px 25px;
   border-radius: 12px;
   display: flex;
@@ -231,12 +229,31 @@ textarea {
   z-index: 1000;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
-.icono-exito {
+
+.banner-exito {
+  background-color: #21a162;
+  color: #fff;
+}
+
+.banner-error {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.icono-exito, .icono-error {
   font-size: 20px;
   color: #fff;
 }
+
 .animate-banner {
   animation: slideDown 0.5s ease, fadeOut 0.5s ease 3.5s forwards;
+}
+
+.error-text {
+  color: #dc3545;
+  font-size: 0.85rem;
+  margin-top: 4px;
+  display: block;
 }
 
 /* ======================= DETALLE PERMISO ======================= */

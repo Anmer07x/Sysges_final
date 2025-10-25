@@ -60,12 +60,40 @@ export const authApi = {
 // ============================================
 export const solicitudesApi = {
   crear: async (solicitud) => {
-    const response = await fetch(`${API_URL}/solicitudes`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(solicitud),
-    });
-    return handleResponse(response);
+    // Si hay archivo adjunto, usar FormData
+    if (solicitud.archivo) {
+      const formData = new FormData();
+      
+      // Añadir datos de la solicitud
+      Object.keys(solicitud).forEach(key => {
+        if (key !== 'archivo') {
+          formData.append(key, solicitud[key]);
+        }
+      });
+      
+      // Añadir archivo si existe
+      if (solicitud.archivo instanceof File) {
+        formData.append('archivo', solicitud.archivo);
+      }
+
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch(`${API_URL}/solicitudes`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+      return handleResponse(response);
+    } else {
+      // Sin archivo, enviar JSON normal
+      const response = await fetch(`${API_URL}/solicitudes`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(solicitud),
+      });
+      return handleResponse(response);
+    }
   },
 
   obtenerMisSolicitudes: async () => {
@@ -153,9 +181,11 @@ export const calendarioApi = {
 };
 
 // Exportar todo como un objeto
-export default {
+const api = {
   auth: authApi,
   solicitudes: solicitudesApi,
   aprobaciones: aprobacionesApi,
   calendario: calendarioApi,
 };
+
+export default api;

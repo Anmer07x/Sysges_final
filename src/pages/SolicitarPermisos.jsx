@@ -7,33 +7,37 @@ import {
   FaCheckCircle,
   FaQuestionCircle,
   FaFilePdf,
-  
+  FaExclamationTriangle
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { useSolicitudes } from "../hooks/useSolicitudes";
 import logo from "../assets/images/fondo.png";
-import helpImage from "../assets/images/permisoshelp.png"; // o tu imagen de ayuda
+import helpImage from "../assets/images/permisoshelp.png";
 
-const diasDisponiblesPorTipo = {
-  Vacaciones: 14,
-  Enfermedad: 30,
-  Maternidad: 126,
-  Paternidad: 11,
-  Otro: 0,
+const TIPOS_SOLICITUD = {
+  Vacaciones: { id: 1, diasDisponibles: 14 },
+  Maternidad: { id: 2, diasDisponibles: 126 },
+  Paternidad: { id: 3, diasDisponibles: 11 },
+  Incapacidad: { id: 4, diasDisponibles: 30 },
+  Otro: { id: 5, diasDisponibles: 7 }
 };
 
 const SolicitarPermisos = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { loading, error, success, crearSolicitud, validarFechas, resetStates } = useSolicitudes();
+  
   const [tipo, setTipo] = useState("Vacaciones");
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
   const [archivo, setArchivo] = useState(null);
   const [archivoPreview, setArchivoPreview] = useState(null);
   const [comentarios, setComentarios] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [diasSeleccionados, setDiasSeleccionados] = useState(0);
   const [maxFechaFin, setMaxFechaFin] = useState("");
   const [showHelp, setShowHelp] = useState(false);
+  const [validationError, setValidationError] = useState("");
 
   useEffect(() => {
     if (fechaInicio && fechaFin) {
@@ -43,7 +47,7 @@ const SolicitarPermisos = () => {
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
       setDiasSeleccionados(diffDays);
 
-      const maxDias = diasDisponiblesPorTipo[tipo];
+      const maxDias = TIPOS_SOLICITUD[tipo].diasDisponibles;
       const fechaMax = new Date(inicio);
       fechaMax.setDate(fechaMax.getDate() + maxDias - 1);
       setMaxFechaFin(fechaMax.toISOString().split("T")[0]);
@@ -72,21 +76,45 @@ const SolicitarPermisos = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (diasSeleccionados > diasDisponiblesPorTipo[tipo]) {
-      alert(
-        `No puedes solicitar más de ${diasDisponiblesPorTipo[tipo]} días para ${tipo}`
-      );
+    setValidationError("");
+    resetStates();
+
+    // Validar fechas
+    const validacion = validarFechas(fechaInicio, fechaFin, TIPOS_SOLICITUD[tipo].diasDisponibles);
+    if (!validacion.isValid) {
+      setValidationError(validacion.message);
       return;
     }
 
-    setLoading(true);
-    setSuccess(false);
+    // Crear FormData para el archivo si existe
+    const formData = new FormData();
+    if (archivo) {
+      formData.append('archivo', archivo);
+    }
 
-    setTimeout(() => {
-      setLoading(false);
-      setSuccess(true);
+    // Mapear el tipo de solicitud a ID
+    const tipoSolicitudMap = {
+      'Vacaciones': 1,
+      'Maternidad': 2,
+      'Paternidad': 3,
+      'Incapacidad': 4,
+      'Otro': 5
+    };
+
+    // Crear la solicitud con el formato correcto
+    const solicitudData = {
+      tipoSolicitudId: tipoSolicitudMap[tipo],
+      fechaInicio,
+      fechaFin,
+      motivo: comentarios
+    };
+
+    const resultado = await crearSolicitud(solicitudData);
+
+    if (resultado.success) {
+      // Limpiar formulario
       setTipo("Vacaciones");
       setFechaInicio("");
       setFechaFin("");
@@ -95,9 +123,11 @@ const SolicitarPermisos = () => {
       setComentarios("");
       setDiasSeleccionados(0);
 
-      // 🔹 Redirección automática al dashboard
-      setTimeout(() => navigate("/dashboard"), 4000);
-    }, 2500);
+      // Redirección automática al dashboard después de 3 segundos
+      setTimeout(() => navigate("/dashboard"), 3000);
+    } else {
+      setValidationError(resultado.error);
+    }
   };
 
   return (
@@ -118,7 +148,14 @@ const SolicitarPermisos = () => {
       {success && (
         <div className="banner-exito animate-banner">
           <FaCheckCircle className="icono-exito" />
-          <p>✅ Tu documento ha sido enviado correctamente</p>
+          <p>✅ Tu solicitud ha sido enviada correctamente</p>
+        </div>
+      )}
+      
+      {(validationError || error) && (
+        <div className="banner-error animate-banner">
+          <FaExclamationTriangle className="icono-error" />
+          <p>❌ {validationError || error}</p>
         </div>
       )}
 
@@ -142,11 +179,11 @@ const SolicitarPermisos = () => {
 
           <label>Tipo de Permiso *</label>
           <select value={tipo} onChange={(e) => setTipo(e.target.value)}>
-            {Object.keys(diasDisponiblesPorTipo).map((permiso) => (
+            {Object.keys(TIPOS_SOLICITUD).map((permiso) => (
               <option key={permiso}>{permiso}</option>
             ))}
           </select>
-          <small>Días disponibles: {diasDisponiblesPorTipo[tipo]}</small>
+          <small>Días disponibles: {TIPOS_SOLICITUD[tipo].diasDisponibles}</small>
 
           <div className="fechas-container">
             <div>
@@ -169,10 +206,9 @@ const SolicitarPermisos = () => {
                 min={fechaInicio || new Date().toISOString().split("T")[0]}
                 max={maxFechaFin || undefined}
               />
-              {diasSeleccionados > diasDisponiblesPorTipo[tipo] && (
+              {diasSeleccionados > TIPOS_SOLICITUD[tipo].diasDisponibles && (
                 <small className="error-text">
-                  ⚠️ Excede los días disponibles ({diasDisponiblesPorTipo[tipo]}
-                  )
+                  ⚠️ Excede los días disponibles ({TIPOS_SOLICITUD[tipo].diasDisponibles})
                 </small>
               )}
             </div>

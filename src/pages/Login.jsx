@@ -1,21 +1,40 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/Login.css";
-import {
-  FaQuestionCircle,
-} from "react-icons/fa";
+import { FaQuestionCircle } from "react-icons/fa";
 import logo from "../assets/images/comfachoco-logo.png";
 import helplogin from "../assets/images/helplogin.png";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
   const [userType, setUserType] = useState("persona");
   const [showHelp, setShowHelp] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const { login } = useAuth();
+  const location = useLocation();
+  const [error, setError] = useState('');
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (userType === "admin") navigate("/panel-admin");
-    else navigate("/dashboard");
+    setError('');
+    
+    try {
+      const correo = e.target[0].value;
+      const password = e.target[1].value;
+
+      const result = await login(correo, password);
+      
+      if (result.success) {
+        const from = location.state?.from?.pathname || 
+          (result.data.empleado.tipo === 'Directivo' ? '/panel-admin' : '/dashboard');
+        navigate(from, { replace: true });
+      } else {
+        setError(result.error);
+      }
+    } catch (error) {
+      setError('Error al intentar iniciar sesión. Por favor, intenta de nuevo.');
+    }
   };
 
   return (
@@ -60,8 +79,9 @@ function Login() {
         <form className="login-form" onSubmit={handleLogin}>
           <input type="text" placeholder="Ingresa tu usuario" required />
           <input type="password" placeholder="Ingresa tu contraseña" required />
+          {error && <p className="error-message">{error}</p>}
           <p className="hint">
-            Usa “supervisor” como usuario para acceder como supervisor.
+            Usa "supervisor" como usuario para acceder como supervisor.
           </p>
           <button type="submit">Ingresar</button>
         </form>
