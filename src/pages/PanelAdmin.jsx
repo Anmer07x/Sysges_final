@@ -4,6 +4,7 @@ import AuthorizedList from "../components/AuthorizedList";
 import PendingRequests from "../components/PendingRequests";
 import SummaryCards from "../components/SummaryCards";
 import fondo from "../assets/images/fondo.png";
+import logo from "../assets/images/comfachoco-logo.png";
 import "../styles/PanelAdmin.css";
 
 function PanelAdmin() {
@@ -12,7 +13,6 @@ function PanelAdmin() {
   const [notifications, setNotifications] = useState(3);
   const [modal, setModal] = useState({ open: false, type: "", message: "" });
   const [searchTerm, setSearchTerm] = useState("");
-  const [logoUrl, setLogoUrl] = useState(""); // Usuario puede pegar URL del logo
   const [activityLog, setActivityLog] = useState([
     "Permiso aprobado para María López",
     "Solicitud rechazada: Juan Pérez",
@@ -56,14 +56,15 @@ function PanelAdmin() {
         {/* HEADER */}
         <header className="admin-header">
           <div className="logo-section">
-            {logoUrl ? (
-              <img src={logoUrl} alt="Logo" className="admin-logo" />
-            ) : (
-              <div className="admin-logo">
-                <span style={{ fontSize: "2rem", fontWeight: "800", color: "#21a162" }}>C</span>
+            <div className="brand-container">
+              <img src={logo} alt="Logo Comfachocó" className="admin-logo" />
+              <div className="brand-text">
+                <span className="brand-name">COMFACHOCÓ</span>
+                <span className="brand-tagline">Caja de Compensación Familiar</span>
               </div>
-            )}
-            <div>
+            </div>
+            <div className="header-divider"></div>
+            <div className="panel-info">
               <h1>Panel de Administración</h1>
               <p>Gestión de permisos y control de empleados</p>
             </div>
@@ -102,18 +103,6 @@ function PanelAdmin() {
         {/* MAIN */}
         <main className="admin-content">
           <SummaryCards compact />
-
-          {/* CONFIGURADOR DE LOGO */}
-          {activeTab !== "legal" && (
-            <div className="logo-config">
-              <input
-                type="text"
-                placeholder="Pega aquí la URL de tu logo (opcional)"
-                value={logoUrl}
-                onChange={(e) => setLogoUrl(e.target.value)}
-              />
-            </div>
-          )}
 
           {/* BUSCADOR - Solo en autorizados y pendientes */}
           {activeTab !== "legal" && (

@@ -35,32 +35,80 @@
 .logo-section {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
   flex-wrap: wrap;
+  flex: 1;
+}
+
+.brand-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-right: 1.5rem;
 }
 
 .admin-logo {
-  width: 60px;
-  height: 60px;
-  border-radius: 12px;
+  width: 80px;
+  height: 80px;
+  border-radius: 16px;
   background: white;
-  padding: 0.3rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  object-fit: cover;
+  padding: 0.5rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.admin-logo:hover {
+  transform: scale(1.05);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.brand-name {
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.brand-tagline {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.header-divider {
+  width: 2px;
+  height: 70px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+.panel-info {
+  flex: 1;
 }
 
 .admin-header h1 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 700;
   letter-spacing: -0.5px;
+  color: white;
 }
 
 .admin-header p {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   opacity: 0.95;
-  margin: 0.2rem 0 0 0;
+  margin: 0.3rem 0 0 0;
   font-weight: 400;
+  color: rgba(255, 255, 255, 0.95);
 }
 
 /* ===== NAVEGACIÓN ===== */
@@ -562,6 +610,34 @@
     flex-direction: column;
     align-items: flex-start;
     padding: 1rem;
+  }
+
+  .logo-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .brand-container {
+    padding-right: 0;
+  }
+
+  .header-divider {
+    display: none;
+  }
+
+  .admin-logo {
+    width: 70px;
+    height: 70px;
+  }
+
+  .brand-name {
+    font-size: 1.2rem;
+  }
+
+  .brand-tagline {
+    font-size: 0.7rem;
   }
 
   .admin-header h1 {
