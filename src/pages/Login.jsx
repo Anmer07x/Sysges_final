@@ -1,34 +1,41 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Login.css";
+import {
+  FaFileAlt,
+  FaFolderOpen,
+  FaCalendarAlt,
+  FaSignOutAlt,
+  FaQuestionCircle,
+} from "react-icons/fa";
 import logo from "../assets/images/comfachoco-logo.png";
+import helplogin from "../assets/images/helplogin.png";
 
 function Login() {
   const [userType, setUserType] = useState("persona");
+  const [showHelp, setShowHelp] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
-
-    // Redirección condicional según el tipo de usuario
-    if (userType === "admin") {
-      navigate("/panel-admin"); // ✅ supervisor
-    } else {
-      navigate("/dashboard"); // ✅ persona normal
-    }
+    if (userType === "admin") navigate("/panel-admin");
+    else navigate("/dashboard");
   };
 
   return (
     <div className="login-container">
+      {/* Fondo difuminado */}
       <div className="background-logo">
         <img src={logo} alt="Fondo Comfachocó" />
       </div>
 
+      {/* Caja principal */}
       <div className="login-box">
         <img src={logo} alt="Logo Comfachocó" className="logo" />
         <h1>Sistema de Gestión de Permisos</h1>
         <p className="subtitle">COMFACHOCÓ - Ingresa tus credenciales</p>
 
+        {/* Selector de rol */}
         <div className="role-selector">
           <label
             className={`role-option ${userType === "persona" ? "active" : ""}`}
@@ -53,6 +60,7 @@ function Login() {
           </label>
         </div>
 
+        {/* Formulario */}
         <form className="login-form" onSubmit={handleLogin}>
           <input type="text" placeholder="Ingresa tu usuario" required />
           <input type="password" placeholder="Ingresa tu contraseña" required />
@@ -62,6 +70,23 @@ function Login() {
           <button type="submit">Ingresar</button>
         </form>
       </div>
+
+      {/* ✅ Botón flotante de ayuda */}
+      <button className="login-help-btn" onClick={() => setShowHelp(true)}>
+        <FaQuestionCircle />
+      </button>
+
+      {/* ✅ Modal de ayuda */}
+      {showHelp && (
+        <div className="help-modal" onClick={() => setShowHelp(false)}>
+          <div className="help-content" onClick={(e) => e.stopPropagation()}>
+            <img src={helplogin} alt="Guía de inicio de sesión" />
+            <button className="close-btn" onClick={() => setShowHelp(false)}>
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

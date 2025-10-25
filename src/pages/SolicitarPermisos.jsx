@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from "react";
 import "../styles/SolicitarPermisos.css";
-import { FaArrowLeft, FaPaperPlane, FaUpload, FaCheckCircle } from "react-icons/fa";
+import {
+  FaArrowLeft,
+  FaPaperPlane,
+  FaUpload,
+  FaCheckCircle,
+  FaQuestionCircle,
+  FaFilePdf,
+  FaFileImage,
+} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/images/fondo.png";
+import helpImage from "../assets/images/permisoshelp.png"; // o tu imagen de ayuda
 
 const diasDisponiblesPorTipo = {
   Vacaciones: 14,
@@ -18,13 +27,14 @@ const SolicitarPermisos = () => {
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
   const [archivo, setArchivo] = useState(null);
+  const [archivoPreview, setArchivoPreview] = useState(null);
   const [comentarios, setComentarios] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [diasSeleccionados, setDiasSeleccionados] = useState(0);
   const [maxFechaFin, setMaxFechaFin] = useState("");
+  const [showHelp, setShowHelp] = useState(false);
 
-  // Actualiza días seleccionados cada vez que cambian las fechas
   useEffect(() => {
     if (fechaInicio && fechaFin) {
       const inicio = new Date(fechaInicio);
@@ -33,7 +43,6 @@ const SolicitarPermisos = () => {
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
       setDiasSeleccionados(diffDays);
 
-      // Calcula fecha máxima permitida según días disponibles
       const maxDias = diasDisponiblesPorTipo[tipo];
       const fechaMax = new Date(inicio);
       fechaMax.setDate(fechaMax.getDate() + maxDias - 1);
@@ -44,10 +53,31 @@ const SolicitarPermisos = () => {
     }
   }, [fechaInicio, fechaFin, tipo]);
 
+  // Vista previa del archivo subido
+  const handleArchivoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setArchivo(file);
+      const fileType = file.type;
+
+      if (fileType.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onloadend = () => setArchivoPreview(reader.result);
+        reader.readAsDataURL(file);
+      } else if (fileType === "application/pdf") {
+        setArchivoPreview("PDF_PREVIEW");
+      } else {
+        setArchivoPreview(null);
+      }
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (diasSeleccionados > diasDisponiblesPorTipo[tipo]) {
-      alert(`No puedes solicitar más de ${diasDisponiblesPorTipo[tipo]} días para ${tipo}`);
+      alert(
+        `No puedes solicitar más de ${diasDisponiblesPorTipo[tipo]} días para ${tipo}`
+      );
       return;
     }
 
@@ -57,15 +87,16 @@ const SolicitarPermisos = () => {
     setTimeout(() => {
       setLoading(false);
       setSuccess(true);
-
       setTipo("Vacaciones");
       setFechaInicio("");
       setFechaFin("");
       setArchivo(null);
+      setArchivoPreview(null);
       setComentarios("");
       setDiasSeleccionados(0);
 
-      setTimeout(() => setSuccess(false), 4000);
+      // 🔹 Redirección automática al home
+      setTimeout(() => navigate("/"), 4000);
     }, 2500);
   };
 
@@ -101,13 +132,14 @@ const SolicitarPermisos = () => {
         </button>
 
         <h2>Formulario de Solicitud</h2>
-        <p className="subtitulo">Completa todos los campos para enviar tu solicitud</p>
+        <p className="subtitulo">
+          Completa todos los campos para enviar tu solicitud
+        </p>
 
         <form onSubmit={handleSubmit}>
           <p className="form-seccion-titulo">Nueva Solicitud de Permiso</p>
           <small>Todos los campos marcados con * son obligatorios</small>
 
-          {/* Tipo de Permiso */}
           <label>Tipo de Permiso *</label>
           <select value={tipo} onChange={(e) => setTipo(e.target.value)}>
             {Object.keys(diasDisponiblesPorTipo).map((permiso) => (
@@ -116,7 +148,6 @@ const SolicitarPermisos = () => {
           </select>
           <small>Días disponibles: {diasDisponiblesPorTipo[tipo]}</small>
 
-          {/* Fechas */}
           <div className="fechas-container">
             <div>
               <label>Fecha de Inicio *</label>
@@ -140,26 +171,43 @@ const SolicitarPermisos = () => {
               />
               {diasSeleccionados > diasDisponiblesPorTipo[tipo] && (
                 <small className="error-text">
-                  ⚠️ Excede los días disponibles ({diasDisponiblesPorTipo[tipo]})
+                  ⚠️ Excede los días disponibles ({diasDisponiblesPorTipo[tipo]}
+                  )
                 </small>
               )}
             </div>
           </div>
 
-          {/* Subir archivo */}
           <label>Subir Archivo del Permiso</label>
           <div className="upload-container">
             <input
               type="file"
               accept=".pdf,.doc,.docx,.jpg,.png"
-              onChange={(e) => setArchivo(e.target.files[0])}
+              onChange={handleArchivoChange}
             />
             <FaUpload className="upload-icon" />
             <span>Haz clic para seleccionar un archivo (Máx. 10MB)</span>
           </div>
-          <small>* Archivo requerido para incapacidades o licencias</small>
 
-          {/* Comentarios */}
+          {/* 🔹 Vista previa del archivo */}
+          {archivoPreview && (
+            <div className="preview-container">
+              <p>Vista previa del archivo:</p>
+              {archivoPreview === "PDF_PREVIEW" ? (
+                <div className="pdf-preview">
+                  <FaFilePdf className="pdf-icon" />
+                  <span>{archivo?.name}</span>
+                </div>
+              ) : (
+                <img
+                  src={archivoPreview}
+                  alt="Vista previa"
+                  className="archivo-preview-img"
+                />
+              )}
+            </div>
+          )}
+
           <label>Comentarios *</label>
           <textarea
             placeholder="Describe el motivo de tu solicitud de permiso..."
@@ -168,12 +216,37 @@ const SolicitarPermisos = () => {
             required
           />
 
-          {/* Enviar */}
           <button type="submit" className="enviar-btn">
             <FaPaperPlane /> Enviar Solicitud
           </button>
         </form>
       </div>
+
+      {/* ===== BOTÓN DE AYUDA FLOTANTE ===== */}
+      <button className="dashboard-help-btn" onClick={() => setShowHelp(true)}>
+        <FaQuestionCircle />
+      </button>
+
+      {/* ===== MODAL DE AYUDA ===== */}
+      {showHelp && (
+        <div
+          className="dashboard-help-modal"
+          onClick={() => setShowHelp(false)}
+        >
+          <div
+            className="dashboard-help-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img src={helpImage} alt="Ayuda del sistema" />
+            <button
+              className="dashboard-close-btn"
+              onClick={() => setShowHelp(false)}
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

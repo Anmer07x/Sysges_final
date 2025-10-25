@@ -184,6 +184,146 @@
   padding: 4px 10px;
   font-size: 13px;
 }
+/* ======== BOTÓN DE AYUDA FLOTANTE ======== */
+.dashboard-help-btn {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  background-color: transparent;
+  color: #21a162;
+  border: none;
+  border-radius: 50%;
+  width: 58px;
+  height: 58px;
+  font-size: 1.8rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1200;
+  transition: all 0.3s ease;
+}
+
+.dashboard-help-btn:hover {
+  background-color: white;
+  transform: scale(2.08);
+}
+
+.dashboard-help-btn::after {
+  content: "¿Ayuda?";
+  position: absolute;
+  right: 50px;
+  background: transparent;
+  color: #21a162;
+  font-weight: bold;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+.dashboard-help-btn:hover::after {
+  opacity: 1;
+  transform: scale(0.9);
+}
+
+/* ======== MODAL DE AYUDA ======== */
+.dashboard-help-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  animation: fadeIn 0.4s ease;
+  backdrop-filter: blur(5px);
+  padding: 1rem;
+}
+
+.dashboard-help-content {
+  position: relative;
+  background: #fff;
+  padding: 1rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  animation: slideUp 0.4s ease;
+}
+
+.dashboard-help-content img {
+  width: 100%;
+  border-radius: 12px;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+/* ======== BOTÓN DE CIERRE ======== */
+.dashboard-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: #ff4d4d;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dashboard-close-btn:hover {
+  background: #e63636;
+  transform: scale(1.05);
+}
+
+/* ======== RESPONSIVE ======== */
+@media (max-width: 768px) {
+  .dashboard-help-btn {
+    width: 52px;
+    height: 52px;
+    font-size: 1.5rem;
+    bottom: 18px;
+    right: 18px;
+  }
+
+  .dashboard-help-content {
+    max-width: 95%;
+    padding: 0.8rem;
+  }
+
+  .dashboard-close-btn {
+    width: 26px;
+    height: 26px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-help-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 1.3rem;
+    bottom: 15px;
+    right: 15px;
+  }
+
+  .dashboard-help-content {
+    padding: 0.6rem;
+    border-radius: 10px;
+  }
+
+  .dashboard-help-content img {
+    border-radius: 8px;
+  }
+}
 
 /* ---------- ANIMACIONES ---------- */
 @keyframes fadeIn {
