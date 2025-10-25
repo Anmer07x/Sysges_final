@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import "../styles/VerMisPermisos.css";
-import { FaArrowLeft, FaPaperclip, FaCheckCircle } from "react-icons/fa";
+import { FaArrowLeft, FaPaperclip, FaCheckCircle, FaQuestionCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/images/fondo.png"; // logo institucional
+import helpImage from "../assets/images/verpermisos.png"; // 🔹 imagen de ayuda
 
 const VerMisPermisos = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [permisos, setPermisos] = useState([]);
+  const [showHelp, setShowHelp] = useState(false); // 🔹 estado del modal de ayuda
 
   // Simulamos carga desde backend
   useEffect(() => {
@@ -94,6 +96,29 @@ const VerMisPermisos = () => {
               </span>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* 🔹 BOTÓN FLOTANTE DE AYUDA */}
+      <button className="help-permisos-btn" onClick={() => setShowHelp(true)}>
+        <FaQuestionCircle />
+      </button>
+
+      {/* 🔹 MODAL DE AYUDA */}
+      {showHelp && (
+        <div className="help-permisos-modal" onClick={() => setShowHelp(false)}>
+          <div
+            className="help-permisos-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img src={helpImage} alt="Ayuda sobre permisos" />
+            <button
+              className="help-permisos-close"
+              onClick={() => setShowHelp(false)}
+            >
+              ✕
+            </button>
+          </div>
         </div>
       )}
     </div>

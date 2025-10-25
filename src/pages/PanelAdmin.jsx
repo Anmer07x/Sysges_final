@@ -94,17 +94,6 @@ function PanelAdmin() {
           </div>
         </main>
 
-        {/* BOTÓN DE AYUDA */}
-        <button
-          className="help-button"
-          onClick={() =>
-            alert(
-              "Soporte Técnico Comfachocó:\n📞 123-456-7890\n📧 soporte@comfachoco.com"
-            )
-          }
-        >
-          ❓
-        </button>
 
         {/* MODAL */}
         {modal.open && (

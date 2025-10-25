@@ -89,8 +89,22 @@
   right: -6px;
 }
 
-/* ===== RESUMEN DE TARJETAS ===== */
-/* ===== RESUMEN DE TARJETAS ===== */
+.logout-btn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  margin-left: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.logout-btn:hover {
+  background-color: #c0392b;
+}
+
+/* ===== TARJETAS DE RESUMEN ===== */
 .summary-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -101,7 +115,7 @@
 }
 
 .summary-card {
-  background: #21a162; /* puedes cambiar color individual usando inline style si quieres */
+  background: #21a162;
   color: white;
   border-radius: 14px;
   padding: 1.5rem 1rem;
@@ -122,6 +136,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: popIn 0.5s ease forwards;
 }
 
 .summary-card h3 {
@@ -134,45 +149,13 @@
   font-weight: 600;
 }
 
-/* Animación */
 @keyframes popIn {
   0% { transform: scale(0.6); opacity: 0; }
   70% { transform: scale(1.1); opacity: 1; }
   100% { transform: scale(1); }
 }
 
-.summary-card .icon {
-  animation: popIn 0.5s ease forwards;
-}
-
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  .summary-cards {
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  }
-
-  .summary-card .icon {
-    font-size: 2rem;
-  }
-}
-.logout-btn {
-  background-color: #e74c3c;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  margin-left: 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.logout-btn:hover {
-  background-color: #c0392b;
-}
-
-
-
-/* ===== TÍTULOS DE SECCIÓN ===== */
+/* ===== SECCIONES ===== */
 .section-title {
   text-align: center;
   margin: 2rem 0 1rem 0;
@@ -189,7 +172,7 @@
   font-size: 1rem;
 }
 
-/* ===== LISTA DE SOLICITUDES PENDIENTES ===== */
+/* ===== LISTA DE SOLICITUDES ===== */
 .pending-list {
   display: flex;
   flex-direction: column;
@@ -232,7 +215,6 @@
   background: #21a16220;
   padding: 0.5rem;
   border-radius: 10px;
-  animation: popIn 0.5s ease forwards;
 }
 
 .pending-info h4 {
@@ -264,7 +246,7 @@
   text-decoration: underline;
 }
 
-/* ===== BOTONES ===== */
+/* ===== BOTONES DE ACCIONES ===== */
 .pending-actions {
   display: flex;
   gap: 0.7rem;
@@ -316,18 +298,6 @@
   background: #555;
 }
 
-/* ===== ANIMACIONES ===== */
-@keyframes popIn {
-  0% { transform: scale(0.6); opacity: 0; }
-  70% { transform: scale(1.1); opacity: 1; }
-  100% { transform: scale(1); }
-}
-
-@keyframes fadeInUp {
-  0% { opacity: 0; transform: translateY(20px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
 /* ===== BOTÓN DE AYUDA ===== */
 .help-button {
   position: fixed;
@@ -342,14 +312,91 @@
   height: 50px;
   cursor: pointer;
   box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, background 0.3s ease;
+  z-index: 1000;
 }
 
 .help-button:hover {
   transform: scale(1.1);
+  background: #17824f;
 }
 
-/* ===== MODAL ===== */
+/* ===== MODAL DE AYUDA PROFESIONAL ===== */
+.help-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  animation: fadeIn 0.3s ease;
+}
+
+.help-modal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 700px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  animation: popIn 0.4s ease;
+}
+
+.help-modal h2 {
+  color: #17824f;
+  margin-bottom: 0.5rem;
+}
+
+.help-modal p {
+  color: #444;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.help-images {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.help-images img {
+  width: 45%;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: transform 0.3s ease;
+}
+
+.help-images img:hover {
+  transform: scale(1.05);
+}
+
+.help-info {
+  background: #f5f5f5;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+.close-help {
+  background: #17824f;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+.close-help:hover {
+  background: #0e5f37;
+}
+
+/* ===== MODAL DE ACCIONES ===== */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -360,7 +407,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999;
+  z-index: 1500;
 }
 
 .modal {
@@ -393,6 +440,17 @@
   background: #17824f;
 }
 
+/* ===== ANIMACIONES ===== */
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .admin-header {
@@ -401,11 +459,15 @@
     text-align: center;
   }
 
-  .pending-actions {
-    flex-direction: column;
-  }
-
   .logo-section {
     justify-content: center;
+  }
+
+  .help-images img {
+    width: 100%;
+  }
+
+  .pending-actions {
+    flex-direction: column;
   }
 }

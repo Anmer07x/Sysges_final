@@ -9,7 +9,7 @@ import {
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/images/fondo.png";
-import helpImage from "../assets/images/Homehelp.png"; // o tu imagen de ayuda
+import helpImage from "../assets/images/helplogin.png"; // o tu imagen de ayuda
 
 const DashboardEmpleado = ({ nombre = "Andrea", diasDisponibles = 15 }) => {
   const navigate = useNavigate();

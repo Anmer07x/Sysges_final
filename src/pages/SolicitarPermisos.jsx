@@ -7,7 +7,7 @@ import {
   FaCheckCircle,
   FaQuestionCircle,
   FaFilePdf,
-  FaFileImage,
+  
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/images/fondo.png";
@@ -95,8 +95,8 @@ const SolicitarPermisos = () => {
       setComentarios("");
       setDiasSeleccionados(0);
 
-      // 🔹 Redirección automática al home
-      setTimeout(() => navigate("/"), 4000);
+      // 🔹 Redirección automática al dashboard
+      setTimeout(() => navigate("/dashboard"), 4000);
     }, 2500);
   };
 
