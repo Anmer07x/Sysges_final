@@ -1,43 +1,61 @@
 import React, { useEffect, useState } from "react";
 import "../styles/VerMisPermisos.css";
-import { FaArrowLeft, FaPaperclip, FaCheckCircle, FaQuestionCircle } from "react-icons/fa";
+import { FaArrowLeft, FaPaperclip, FaCheckCircle, FaQuestionCircle, FaTimesCircle, FaSpinner } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import logo from "../assets/images/fondo.png"; // logo institucional
-import helpImage from "../assets/images/verpermisos.png"; // 🔹 imagen de ayuda
+import { useAuth } from "../context/AuthContext";
+import { solicitudesApi } from "../services/api";
+import logo from "../assets/images/fondo.png";
+import helpImage from "../assets/images/verpermisos.png";
+
+// Mapeo de tipos de solicitud
+const TIPOS_SOLICITUD = {
+  1: "Vacaciones",
+  2: "Maternidad",
+  3: "Paternidad",
+  4: "Incapacidad",
+  5: "Otro"
+};
+
+const obtenerTipoPermiso = (id) => TIPOS_SOLICITUD[id] || "Desconocido";
+
+const calcularDias = (fechaInicio, fechaFin) => {
+  const inicio = new Date(fechaInicio);
+  const fin = new Date(fechaFin);
+  const diffTime = fin.getTime() - inicio.getTime();
+  return Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+};
 
 const VerMisPermisos = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [permisos, setPermisos] = useState([]);
-  const [showHelp, setShowHelp] = useState(false); // 🔹 estado del modal de ayuda
+  const [showHelp, setShowHelp] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Simulamos carga desde backend
+  // Cargar permisos desde el backend
   useEffect(() => {
-    setTimeout(() => {
-      setPermisos([
-        {
-          id: 1,
-          tipo: "Maternidad",
-          fechaInicio: "2025-10-25",
-          fechaFin: "2025-10-25",
-          dias: 1,
-          comentarios: "bebrthtrhtrtsggtbtrbsrthesrhethrthtrhthrhrhht",
-          archivo: "cpnfachoco.png",
-          estado: "pendiente",
-        },
-        {
-          id: 2,
-          tipo: "Vacaciones",
-          fechaInicio: "2025-12-10",
-          fechaFin: "2025-12-20",
-          dias: 10,
-          comentarios: "Vacaciones familiares programadas",
-          archivo: "permiso_vacaciones.pdf",
-          estado: "aprobado",
-        },
-      ]);
-      setLoading(false);
-    }, 2000);
+    const cargarPermisos = async () => {
+      try {
+        const data = await solicitudesApi.obtenerMisSolicitudes();
+        const permisosFormateados = data.map(permiso => ({
+          id: permiso.id,
+          tipo: obtenerTipoPermiso(permiso.tipoSolicitudId),
+          fechaInicio: new Date(permiso.fechaInicio).toLocaleDateString(),
+          fechaFin: new Date(permiso.fechaFin).toLocaleDateString(),
+          dias: calcularDias(permiso.fechaInicio, permiso.fechaFin),
+          comentarios: permiso.motivo,
+          archivo: permiso.archivoUrl,
+          estado: permiso.estado.toLowerCase()
+        }));
+        setPermisos(permisosFormateados);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    cargarPermisos();
   }, []);
 
   return (
@@ -56,8 +74,15 @@ const VerMisPermisos = () => {
         </div>
       )}
 
+      {/* Mensaje de error */}
+      {error && (
+        <div className="error-message">
+          <p>❌ {error}</p>
+        </div>
+      )}
+
       {/* Contenido principal */}
-      {!loading && (
+      {!loading && !error && (
         <div className="verpermisos-card animate-form">
           <button className="volver-btn" onClick={() => navigate("/dashboard")}>
             <FaArrowLeft /> Volver al Panel
@@ -68,43 +93,56 @@ const VerMisPermisos = () => {
             Aquí puedes revisar tus solicitudes y su estado actual.
           </p>
 
-          {permisos.map((permiso, index) => (
-            <div
-              key={permiso.id}
-              className={`permiso-item animate-permiso`}
-              style={{ animationDelay: `${index * 0.15}s` }}
-            >
-              <div className="permiso-info">
-                <p className="permiso-titulo">{permiso.tipo}</p>
-                <p className="permiso-fecha">
-                  {permiso.fechaInicio} - {permiso.fechaFin} ({permiso.dias}{" "}
-                  día{permiso.dias > 1 ? "s" : ""})
-                </p>
-                <p className="permiso-comentarios">{permiso.comentarios}</p>
-                <div className="permiso-archivo">
-                  <FaPaperclip className="icono-archivo" />
-                  <span>{permiso.archivo}</span>
-                </div>
-              </div>
-              <span
-                className={`estado ${
-                  permiso.estado === "pendiente" ? "pendiente" : "aprobado"
-                }`}
-              >
-                {permiso.estado === "aprobado" && <FaCheckCircle />}{" "}
-                {permiso.estado}
-              </span>
+          {permisos.length === 0 ? (
+            <div className="no-permisos">
+              <p>No tienes solicitudes de permisos registradas.</p>
             </div>
-          ))}
+          ) : (
+            permisos.map((permiso, index) => (
+              <div
+                key={permiso.id}
+                className={`permiso-item animate-permiso`}
+                style={{ animationDelay: `${index * 0.15}s` }}
+              >
+                <div className="permiso-info">
+                  <p className="permiso-titulo">{permiso.tipo}</p>
+                  <p className="permiso-fecha">
+                    {permiso.fechaInicio} - {permiso.fechaFin} ({permiso.dias}{" "}
+                    día{permiso.dias > 1 ? "s" : ""})
+                  </p>
+                  <p className="permiso-comentarios">{permiso.comentarios}</p>
+                  {permiso.archivo && (
+                    <div className="permiso-archivo">
+                      <FaPaperclip className="icono-archivo" />
+                      <a 
+                        href={permiso.archivo} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="archivo-link"
+                      >
+                        Ver archivo adjunto
+                      </a>
+                    </div>
+                  )}
+                </div>
+                <span
+                  className={`estado ${permiso.estado}`}
+                >
+                  {permiso.estado === "aprobado" && <FaCheckCircle />}{" "}
+                  {permiso.estado.charAt(0).toUpperCase() + permiso.estado.slice(1)}
+                </span>
+              </div>
+            ))
+          )}
         </div>
       )}
 
-      {/* 🔹 BOTÓN FLOTANTE DE AYUDA */}
+      {/* Botón flotante de ayuda */}
       <button className="help-permisos-btn" onClick={() => setShowHelp(true)}>
         <FaQuestionCircle />
       </button>
 
-      {/* 🔹 MODAL DE AYUDA */}
+      {/* Modal de ayuda */}
       {showHelp && (
         <div className="help-permisos-modal" onClick={() => setShowHelp(false)}>
           <div

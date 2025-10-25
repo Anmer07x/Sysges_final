@@ -1,18 +1,71 @@
 import React, { useState, useEffect } from "react";
 import "../styles/CalendarioEquipo.css";
-import { FaArrowLeft, FaChevronLeft, FaChevronRight, FaUser } from "react-icons/fa";
+import {
+  FaArrowLeft,
+  FaChevronLeft,
+  FaChevronRight,
+  FaUser,
+  FaExclamationTriangle,
+} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { calendarioApi } from "../services/api";
 import logo from "../assets/images/fondo.png";
+
+// Mapeo de tipos de solicitud
+const TIPOS_SOLICITUD = {
+  1: "Vacaciones",
+  2: "Maternidad",
+  3: "Paternidad",
+  4: "Incapacidad",
+  5: "Otro"
+};
 
 const CalendarioEquipo = () => {
   const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [selectedPermiso, setSelectedPermiso] = useState(null);
+  const [permisosActivos, setPermisosActivos] = useState([]);
+  const [estadisticas, setEstadisticas] = useState(null);
 
+  // Cargar datos del calendario
   useEffect(() => {
-    setTimeout(() => setLoading(false), 2000);
-  }, []);
+    const cargarDatosCalendario = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const anio = currentDate.getFullYear();
+        const mes = currentDate.getMonth() + 1;
+        
+        // Cargar permisos y estadísticas en paralelo
+        const [permisos, stats] = await Promise.all([
+          calendarioApi.obtenerPorMes(anio, mes),
+          calendarioApi.obtenerEstadisticas(anio, mes)
+        ]);
+        
+        // Formatear los permisos para el calendario
+        const permisosFormateados = permisos.map(p => ({
+          nombre: `${p.empleado.nombre} ${p.empleado.apellido}`,
+          tipo: TIPOS_SOLICITUD[p.tipoSolicitudId],
+          desde: p.fechaInicio,
+          hasta: p.fechaFin,
+          dias: Math.ceil((new Date(p.fechaFin) - new Date(p.fechaInicio)) / (1000 * 60 * 60 * 24)) + 1
+        }));
+
+        setPermisosActivos(permisosFormateados);
+        setEstadisticas(stats);
+        setSelectedPermiso(null);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    cargarDatosCalendario();
+  }, [currentDate]);
 
   // Generar días del mes actual
   const getDaysInMonth = (date) => {
@@ -22,22 +75,24 @@ const CalendarioEquipo = () => {
   };
 
   const daysInMonth = getDaysInMonth(currentDate);
-  const monthName = currentDate.toLocaleString("es-ES", { month: "long", year: "numeric" });
+  const monthName = currentDate.toLocaleString("es-ES", {
+    month: "long",
+    year: "numeric",
+  });
 
   // Cambiar de mes
   const changeMonth = (offset) => {
     // Crear nueva fecha para evitar mutación
-    const newDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + offset, 1);
+    const newDate = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + offset,
+      1
+    );
     setCurrentDate(newDate);
     setSelectedPermiso(null); // reset selección al cambiar mes
   };
 
-  // Datos simulados de permisos con fechas completas para facilitar cálculo
-  // formato ISO yyyy-mm-dd
-  const permisosActivos = [
-    { nombre: "María González", tipo: "Maternidad", desde: "2025-10-31", hasta: "2026-02-27", dias: 126 },
-    { nombre: "Juan Pérez", tipo: "Vacaciones", desde: "2025-10-15", hasta: "2025-10-20", dias: 6 },
-  ];
+  // Los permisos activos ahora se manejan con el estado permisosActivos
 
   // Función para saber si un día está ocupado y por qué permiso
   const permisoParaDia = (year, month, day) => {
@@ -64,8 +119,8 @@ VERSION:2.0
 PRODID:-//CalendarioEquipo//ES
 BEGIN:VEVENT
 SUMMARY=${permiso.tipo} - ${permiso.nombre}
-DTSTART;VALUE=DATE:${formatDateICS(startDate).slice(0,8)}
-DTEND;VALUE=DATE:${formatDateICS(endDate).slice(0,8)}
+DTSTART;VALUE=DATE:${formatDateICS(startDate).slice(0, 8)}
+DTEND;VALUE=DATE:${formatDateICS(endDate).slice(0, 8)}
 DESCRIPTION=Permiso de ${permiso.nombre} (${permiso.tipo})
 END:VEVENT
 END:VCALENDAR`;
@@ -79,7 +134,9 @@ END:VCALENDAR`;
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    const nombreArchivo = `${selectedPermiso.nombre.replace(/\s/g, "_")}_${selectedPermiso.tipo}.ics`;
+    const nombreArchivo = `${selectedPermiso.nombre.replace(/\s/g, "_")}_${
+      selectedPermiso.tipo
+    }.ics`;
     link.download = nombreArchivo;
     link.click();
     URL.revokeObjectURL(url);
@@ -99,7 +156,17 @@ END:VCALENDAR`;
         </div>
       )}
 
-      {!loading && (
+      {error && (
+        <div className="error-overlay">
+          <FaExclamationTriangle className="error-icon" />
+          <p className="error-text">Error: {error}</p>
+          <button onClick={() => window.location.reload()} className="retry-btn">
+            Reintentar
+          </button>
+        </div>
+      )}
+
+      {!loading && !error && (
         <div className="calendario-content animate-form">
           {/* Encabezado */}
           <div className="header">
@@ -116,7 +183,9 @@ END:VCALENDAR`;
             {/* Calendario */}
             <div className="calendario-card">
               <div className="calendario-header">
-                <h3>{monthName.charAt(0).toUpperCase() + monthName.slice(1)}</h3>
+                <h3>
+                  {monthName.charAt(0).toUpperCase() + monthName.slice(1)}
+                </h3>
                 <div className="month-controls">
                   <button onClick={() => changeMonth(-1)}>
                     <FaChevronLeft />
@@ -137,14 +206,25 @@ END:VCALENDAR`;
               <div className="dias-grid">
                 {Array.from({ length: daysInMonth }, (_, i) => {
                   const day = i + 1;
-                  const permiso = permisoParaDia(currentDate.getFullYear(), currentDate.getMonth(), day);
+                  const permiso = permisoParaDia(
+                    currentDate.getFullYear(),
+                    currentDate.getMonth(),
+                    day
+                  );
                   return (
                     <div
                       key={i}
-                      className={`dia ${permiso ? "ocupado" : "disponible"} animate-day`}
-                      style={{ animationDelay: `${i * 0.02}s`, cursor: permiso ? "pointer" : "default" }}
+                      className={`dia ${
+                        permiso ? "ocupado" : "disponible"
+                      } animate-day`}
+                      style={{
+                        animationDelay: `${i * 0.02}s`,
+                        cursor: permiso ? "pointer" : "default",
+                      }}
                       onClick={() => permiso && setSelectedPermiso(permiso)}
-                      title={permiso ? `${permiso.nombre} - ${permiso.tipo}` : ""}
+                      title={
+                        permiso ? `${permiso.nombre} - ${permiso.tipo}` : ""
+                      }
                     >
                       {day}
                     </div>
@@ -157,17 +237,29 @@ END:VCALENDAR`;
                 {selectedPermiso ? (
                   <>
                     <h4>Permiso Seleccionado</h4>
-                    <p><strong>Nombre:</strong> {selectedPermiso.nombre}</p>
-                    <p><strong>Tipo:</strong> {selectedPermiso.tipo}</p>
-                    <p><strong>Desde:</strong> {selectedPermiso.desde}</p>
-                    <p><strong>Hasta:</strong> {selectedPermiso.hasta}</p>
-                    <p><strong>Días:</strong> {selectedPermiso.dias}d</p>
+                    <p>
+                      <strong>Nombre:</strong> {selectedPermiso.nombre}
+                    </p>
+                    <p>
+                      <strong>Tipo:</strong> {selectedPermiso.tipo}
+                    </p>
+                    <p>
+                      <strong>Desde:</strong> {selectedPermiso.desde}
+                    </p>
+                    <p>
+                      <strong>Hasta:</strong> {selectedPermiso.hasta}
+                    </p>
+                    <p>
+                      <strong>Días:</strong> {selectedPermiso.dias}d
+                    </p>
                     <button onClick={downloadICS} className="btn-exportar-ics">
                       Exportar a Google Calendar
                     </button>
                   </>
                 ) : (
-                  <p>Haz clic en un día ocupado para ver detalles del permiso</p>
+                  <p>
+                    Haz clic en un día ocupado para ver detalles del permiso
+                  </p>
                 )}
               </div>
             </div>
@@ -177,45 +269,11 @@ END:VCALENDAR`;
               <h3>Estado General del Mes</h3>
               <div className="estado-box verde">
                 <p>Días Disponibles:</p>
-                <h4>
-                  {
-                    // Calcular días disponibles dinámicamente
-                    daysInMonth - permisosActivos.reduce((acc, permiso) => {
-                      const desde = new Date(permiso.desde);
-                      const hasta = new Date(permiso.hasta);
-                      // Contar días de permiso que caen en el mes actual
-                      const mes = currentDate.getMonth();
-                      const año = currentDate.getFullYear();
-
-                      let start = desde < new Date(año, mes, 1) ? new Date(año, mes, 1) : desde;
-                      let end = hasta > new Date(año, mes, daysInMonth) ? new Date(año, mes, daysInMonth) : hasta;
-
-                      if (start > end) return 0;
-
-                      return acc + ( (end - start) / (1000*60*60*24) + 1 );
-                    }, 0)
-                  }
-                </h4>
+                <h4>{estadisticas?.diasDisponibles || daysInMonth}</h4>
               </div>
               <div className="estado-box rojo">
                 <p>Días Ocupados:</p>
-                <h4>
-                  {
-                    permisosActivos.reduce((acc, permiso) => {
-                      const desde = new Date(permiso.desde);
-                      const hasta = new Date(permiso.hasta);
-                      const mes = currentDate.getMonth();
-                      const año = currentDate.getFullYear();
-
-                      let start = desde < new Date(año, mes, 1) ? new Date(año, mes, 1) : desde;
-                      let end = hasta > new Date(año, mes, daysInMonth) ? new Date(año, mes, daysInMonth) : hasta;
-
-                      if (start > end) return 0;
-
-                      return acc + ( (end - start) / (1000*60*60*24) + 1 );
-                    }, 0)
-                  }
-                </h4>
+                <h4>{estadisticas?.diasOcupados || 0}</h4>
               </div>
               <div className="estado-box">
                 <p>Permisos Activos:</p>

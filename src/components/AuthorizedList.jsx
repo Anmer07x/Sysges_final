@@ -1,43 +1,158 @@
-// src/components/AuthorizedList.jsx
-import React, { useState } from "react";
-import { permisosAutorizadosData } from "../data/data";
-import "../styles/PendingRequests.css"; // Reutilizamos el mismo CSS para cards
+import React, { useState, useEffect } from "react";
+import "../styles/PendingRequests.css";
+import { FaSpinner } from "react-icons/fa";
+import { solicitudesApi } from "../services/api";
 
-function AuthorizedList({ onAction }) {
-  const [requests, setRequests] = useState(permisosAutorizadosData);
+const TIPOS_SOLICITUD = {
+  1: "Vacaciones",
+  2: "Maternidad",
+  3: "Paternidad",
+  4: "Incapacidad",
+  5: "Otro",
+};
 
+function AuthorizedList({ onAction, searchTerm = "" }) {
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Cargar permisos aprobados
+  useEffect(() => {
+    let mounted = true;
+
+    const cargarPermisos = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const permisos = await solicitudesApi.obtenerAprobadas();
+        if (!mounted) return;
+
+        const formatted = permisos.map((p) => {
+          const emp = p.empleado || {};
+          const nombre = `${emp.nombre || ""} ${emp.apellido || ""}`.trim();
+          const dias =
+            p.fechaInicio && p.fechaFin
+              ? Math.ceil(
+                  (new Date(p.fechaFin) - new Date(p.fechaInicio)) /
+                    (1000 * 60 * 60 * 24)
+                ) + 1
+              : 0;
+
+          return {
+            id: p.id,
+            nombre,
+            cargo: emp.cargo || "",
+            tipo: TIPOS_SOLICITUD[p.tipoSolicitudId] || "Otro",
+            inicio: p.fechaInicio
+              ? new Date(p.fechaInicio).toLocaleDateString()
+              : "",
+            fin: p.fechaFin ? new Date(p.fechaFin).toLocaleDateString() : "",
+            dias,
+            comentarios: p.motivo || "",
+            contacto: emp.telefono || "No disponible",
+            estado: p.estado || "aprobado",
+          };
+        });
+
+        setRequests(formatted);
+      } catch (err) {
+        setError(err.message || "Error al cargar las solicitudes.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    cargarPermisos();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // Acción local (Eliminar)
   const handleAction = (id, action) => {
-    const updated = requests.map(r =>
-      r.id === id ? { ...r, estado: action } : r
-    );
-    setRequests(updated);
-    const req = requests.find(r => r.id === id);
-    if (req) onAction(action === "aprobado" ? "approve" : "delete", req.nombre);
+    setRequests((prev) => prev.filter((r) => r.id !== id));
+
+    const req = requests.find((r) => r.id === id);
+    if (req && onAction) {
+      onAction(action === "aprobado" ? "approve" : "delete", req.nombre);
+    }
   };
 
+  // Filtrado por búsqueda
+  const filtered = searchTerm
+    ? requests.filter(
+        (r) =>
+          r.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          r.tipo.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : requests;
+
+  // Render
   return (
     <div className="pending-list">
-      {requests.map((req) => (
-        <div key={req.id} className="pending-card">
-          <div className="pending-header">
-            <div className="pending-info">
-              <span className="pending-icon">✅</span>
-              <h4>{req.nombre}</h4>
-              <small>{req.cargo}</small>
+      {loading && (
+        <div className="loading-state">
+          <FaSpinner className="spinner" />
+          <p>Cargando permisos aprobados...</p>
+        </div>
+      )}
+
+      {error && (
+        <div className="error-state">
+          <p>Error al cargar las solicitudes: {error}</p>
+          <button onClick={() => window.location.reload()}>Reintentar</button>
+        </div>
+      )}
+
+      {!loading && !error && filtered.length === 0 && (
+        <div className="empty-state">
+          -
+          {searchTerm ? " que coincidan con la búsqueda." : "."}
+        </div>
+      )}
+
+      {!loading &&
+        !error &&
+        filtered.map((req) => (
+          <div key={req.id} className="pending-card">
+            <div className="pending-header">
+              <div className="pending-info">
+                <span className="pending-icon">✅</span>
+                <h4>{req.nombre}</h4>
+                <small>{req.cargo}</small>
+              </div>
+            </div>
+
+            <div className="pending-body">
+              <p>
+                <strong>Tipo:</strong> {req.tipo}
+              </p>
+              <p>
+                <strong>Periodo:</strong> {req.inicio} → {req.fin}
+              </p>
+              <p>
+                <strong>Días Totales:</strong> {req.dias}
+              </p>
+              <p>
+                <strong>Comentarios:</strong> {req.comentarios}
+              </p>
+              <p>
+                <strong>Contacto:</strong>{" "}
+                <a href={`tel:${req.contacto}`}>{req.contacto}</a>
+              </p>
+            </div>
+
+            <div className="pending-actions">
+              <button
+                className="pending-delete"
+                onClick={() => handleAction(req.id, "eliminado")}
+              >
+                Eliminar
+              </button>
             </div>
           </div>
-          <div className="pending-body">
-            <p><strong>Tipo:</strong> {req.tipo}</p>
-            <p><strong>Periodo:</strong> {req.inicio} → {req.fin}</p>
-            <p><strong>Días Totales:</strong> {req.dias}</p>
-            <p><strong>Comentarios:</strong> {req.comentarios}</p>
-            <p><strong>Contacto:</strong> <a href={`tel:${req.contacto}`}>{req.contacto}</a></p>
-          </div>
-          <div className="pending-actions">
-            <button className="pending-delete" onClick={() => handleAction(req.id, "eliminado")}>Eliminar</button>
-          </div>
-        </div>
-      ))}
+        ))}
     </div>
   );
 }

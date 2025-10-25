@@ -127,6 +127,48 @@ export const solicitudesApi = {
     });
     return handleResponse(response);
   },
+
+  aprobarSolicitud: async (id) => {
+    try {
+      const response = await fetch(`${API_URL}/solicitudes/${id}/aprobar`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+      });
+      await handleResponse(response);
+      return true;
+    } catch (error) {
+      console.error('Error al aprobar solicitud:', error);
+      throw error;
+    }
+  },
+
+  rechazarSolicitud: async (id) => {
+    try {
+      const response = await fetch(`${API_URL}/solicitudes/${id}/rechazar`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+      });
+      await handleResponse(response);
+      return true;
+    } catch (error) {
+      console.error('Error al rechazar solicitud:', error);
+      throw error;
+    }
+  },
+
+  eliminarSolicitud: async (id) => {
+    try {
+      const response = await fetch(`${API_URL}/solicitudes/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(),
+      });
+      await handleResponse(response);
+      return true;
+    } catch (error) {
+      console.error('Error al eliminar solicitud:', error);
+      throw error;
+    }
+  },
 };
 
 // ============================================
