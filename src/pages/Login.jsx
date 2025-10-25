@@ -2,10 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Login.css";
 import {
-  FaFileAlt,
-  FaFolderOpen,
-  FaCalendarAlt,
-  FaSignOutAlt,
   FaQuestionCircle,
 } from "react-icons/fa";
 import logo from "../assets/images/comfachoco-logo.png";
@@ -24,18 +20,18 @@ function Login() {
 
   return (
     <div className="login-container">
-      {/* Fondo difuminado */}
+      {/* ===== FONDO DIFUMINADO ===== */}
       <div className="background-logo">
         <img src={logo} alt="Fondo Comfachocó" />
       </div>
 
-      {/* Caja principal */}
+      {/* ===== CAJA PRINCIPAL ===== */}
       <div className="login-box">
         <img src={logo} alt="Logo Comfachocó" className="logo" />
         <h1>Sistema de Gestión de Permisos</h1>
         <p className="subtitle">COMFACHOCÓ - Ingresa tus credenciales</p>
 
-        {/* Selector de rol */}
+        {/* ===== SELECTOR DE ROL ===== */}
         <div className="role-selector">
           <label
             className={`role-option ${userType === "persona" ? "active" : ""}`}
@@ -60,7 +56,7 @@ function Login() {
           </label>
         </div>
 
-        {/* Formulario */}
+        {/* ===== FORMULARIO ===== */}
         <form className="login-form" onSubmit={handleLogin}>
           <input type="text" placeholder="Ingresa tu usuario" required />
           <input type="password" placeholder="Ingresa tu contraseña" required />
@@ -71,17 +67,25 @@ function Login() {
         </form>
       </div>
 
-      {/* ✅ Botón flotante de ayuda */}
-      <button className="login-help-btn" onClick={() => setShowHelp(true)}>
+      {/* ===== BOTÓN FLOTANTE DE AYUDA ===== */}
+      <button
+        className="login-help-btn"
+        onClick={() => setShowHelp(true)}
+        aria-label="Mostrar ayuda"
+      >
         <FaQuestionCircle />
       </button>
 
-      {/* ✅ Modal de ayuda */}
+      {/* ===== MODAL DE AYUDA (CORREGIDO) ===== */}
       {showHelp && (
-        <div className="help-modal" onClick={() => setShowHelp(false)}>
-          <div className="help-content" onClick={(e) => e.stopPropagation()}>
+        <div className="help-modal-overlay" onClick={() => setShowHelp(false)}>
+          <div className="help-modal-content" onClick={(e) => e.stopPropagation()}>
             <img src={helplogin} alt="Guía de inicio de sesión" />
-            <button className="close-btn" onClick={() => setShowHelp(false)}>
+            <button
+              className="help-close-btn"
+              onClick={() => setShowHelp(false)}
+              aria-label="Cerrar ayuda"
+            >
               ✕
             </button>
           </div>
