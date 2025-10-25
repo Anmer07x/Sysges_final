@@ -9,6 +9,7 @@ import {
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { calendarioApi } from "../services/api";
+import { formatDate, formatShortDate, formatMonthYear, calculateDaysBetween } from "../utils/dateUtils";
 import logo from "../assets/images/fondo.png";
 
 // Mapeo de tipos de solicitud
@@ -50,8 +51,7 @@ const CalendarioEquipo = () => {
           nombre: `${p.empleado.nombre} ${p.empleado.apellido}`,
           tipo: TIPOS_SOLICITUD[p.tipoSolicitudId],
           desde: p.fechaInicio,
-          hasta: p.fechaFin,
-          dias: Math.ceil((new Date(p.fechaFin) - new Date(p.fechaInicio)) / (1000 * 60 * 60 * 24)) + 1
+          hasta: p.fechaFin
         }));
 
         setPermisosActivos(permisosFormateados);
@@ -75,10 +75,7 @@ const CalendarioEquipo = () => {
   };
 
   const daysInMonth = getDaysInMonth(currentDate);
-  const monthName = currentDate.toLocaleString("es-ES", {
-    month: "long",
-    year: "numeric",
-  });
+  const monthName = formatMonthYear(currentDate);
 
   // Cambiar de mes
   const changeMonth = (offset) => {
@@ -244,13 +241,13 @@ END:VCALENDAR`;
                       <strong>Tipo:</strong> {selectedPermiso.tipo}
                     </p>
                     <p>
-                      <strong>Desde:</strong> {selectedPermiso.desde}
+                      <strong>Desde:</strong> {formatDate(selectedPermiso.desde)}
                     </p>
                     <p>
-                      <strong>Hasta:</strong> {selectedPermiso.hasta}
+                      <strong>Hasta:</strong> {formatDate(selectedPermiso.hasta)}
                     </p>
                     <p>
-                      <strong>Días:</strong> {selectedPermiso.dias}d
+                      <strong>Días:</strong> {calculateDaysBetween(selectedPermiso.desde, selectedPermiso.hasta)}d
                     </p>
                     <button onClick={downloadICS} className="btn-exportar-ics">
                       Exportar a Google Calendar
@@ -293,9 +290,9 @@ END:VCALENDAR`;
                     </div>
                     <div className="ausencia-footer">
                       <p>
-                        {permiso.desde} – {permiso.hasta}
+                        {formatShortDate(permiso.desde)} – {formatShortDate(permiso.hasta)}
                       </p>
-                      <span>{permiso.dias}d</span>
+                      <span>{calculateDaysBetween(permiso.desde, permiso.hasta)}d</span>
                     </div>
                   </div>
                 ))}
