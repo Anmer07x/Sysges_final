@@ -20,7 +20,9 @@ const TIPOS_SOLICITUD = {
   Maternidad: { id: 2, diasDisponibles: 126 },
   Paternidad: { id: 3, diasDisponibles: 11 },
   Incapacidad: { id: 4, diasDisponibles: 30 },
-  Otro: { id: 5, diasDisponibles: 7 }
+  
+
+
 };
 
 const SolicitarPermisos = () => {
@@ -100,11 +102,10 @@ const SolicitarPermisos = () => {
       'Maternidad': 2,
       'Paternidad': 3,
       'Incapacidad': 4,
-      // 'Luto': 5,
-      // 'Calamidad Domestica': 6,
-      // 'Lactancia': 7,
-      // 'Incapacidad Medica': 8,
-      'Otro': 9
+      'Luto': 5,
+      'Calamidad Domestica': 6,
+      'Lactancia': 7,
+      'Otro': 8
     };
 
     // Crear la solicitud con el formato correcto
