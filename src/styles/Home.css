@@ -53,7 +53,7 @@
   font-size: 15px;
 }
 
-.logout-btn {
+.logout-btn2 {
   background-color: transparent;
   border: 1px solid #21a162;
   color: #21a162;
@@ -68,7 +68,7 @@
   white-space: nowrap;
 }
 
-.logout-btn:hover {
+.logout-btn2:hover {
   background-color: #21a162;
   color: white;
 }

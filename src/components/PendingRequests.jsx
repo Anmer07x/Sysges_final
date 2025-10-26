@@ -18,6 +18,11 @@ function PendingRequests({ onAction, searchTerm = "" }) {
   const [error, setError] = useState(null);
   const [actionInProgress, setActionInProgress] = useState(false);
 
+  // Estados para el modal
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedAction, setSelectedAction] = useState(null);
+  const [selectedRequest, setSelectedRequest] = useState(null);
+
   useEffect(() => {
     let mounted = true;
     const cargarSolicitudesPendientes = async () => {
@@ -66,15 +71,10 @@ function PendingRequests({ onAction, searchTerm = "" }) {
 
   const handleAction = async (id, action) => {
     if (actionInProgress) return;
-    
-    if (!window.confirm(`¿Está seguro que desea ${action} esta solicitud?`)) {
-      return;
-    }
 
     try {
       setActionInProgress(true);
       
-      // Realizar la acción en el backend
       let success = false;
       switch (action) {
         case "aprobado":
@@ -91,10 +91,8 @@ function PendingRequests({ onAction, searchTerm = "" }) {
       }
 
       if (success) {
-        // Actualizar estado local
         setRequests(prev => prev.filter(r => r.id !== id));
-        
-        // Notificar al componente padre
+
         const req = requests.find(r => r.id === id);
         if (req && onAction) {
           onAction(
@@ -167,28 +165,59 @@ function PendingRequests({ onAction, searchTerm = "" }) {
           <div className="pending-actions">
             <button
               className="pending-approve"
-              onClick={() => handleAction(req.id, "aprobado")}
+              onClick={() => { setSelectedAction("aprobado"); setSelectedRequest(req); setModalVisible(true); }}
               disabled={actionInProgress}
             >
-              {actionInProgress ? 'Procesando...' : 'Aprobar'}
+              Aprobar
             </button>
             <button
               className="pending-reject"
-              onClick={() => handleAction(req.id, "rechazado")}
+              onClick={() => { setSelectedAction("rechazado"); setSelectedRequest(req); setModalVisible(true); }}
               disabled={actionInProgress}
             >
-              {actionInProgress ? 'Procesando...' : 'Rechazar'}
+              Rechazar
             </button>
             <button
               className="pending-delete"
-              onClick={() => handleAction(req.id, "eliminado")}
+              onClick={() => { setSelectedAction("eliminado"); setSelectedRequest(req); setModalVisible(true); }}
               disabled={actionInProgress}
             >
-              {actionInProgress ? 'Procesando...' : 'Eliminar'}
+              Eliminar
             </button>
           </div>
         </div>
       ))}
+
+      {/* Modal de confirmación */}
+      {modalVisible && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Confirmar acción</h3>
+            <p>
+              ¿Desea cambiar a estado{" "}
+              <strong>{selectedAction}</strong> la solicitud de{" "}
+              <strong>{selectedRequest?.nombre}</strong>?
+            </p>
+            <div className="modal-buttons">
+              <button
+                className="modal-confirm"
+                onClick={() => {
+                  handleAction(selectedRequest.id, selectedAction);
+                  setModalVisible(false);
+                }}
+              >
+                Confirmar
+              </button>
+              <button
+                className="modal-cancel"
+                onClick={() => setModalVisible(false)}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

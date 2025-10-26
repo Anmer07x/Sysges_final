@@ -68,7 +68,7 @@ const DashboardEmpleado = () => {
           </div>
           <p className="bienvenida">Bienvenido, {user?.nombre || 'Usuario'}</p>
         </div>
-        <button className="logout-btn" onClick={handleLogout}>
+        <button className="logout-btn2" onClick={handleLogout}>
           <FaSignOutAlt /> Cerrar Sesión
         </button>
       </div>

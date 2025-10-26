@@ -15,6 +15,7 @@ function AuthorizedList({ onAction, searchTerm = "" }) {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [deleting, setDeleting] = useState(null); // ID de la solicitud que se está eliminando
 
   // Cargar permisos aprobados
   useEffect(() => {
@@ -70,12 +71,35 @@ function AuthorizedList({ onAction, searchTerm = "" }) {
   }, []);
 
   // Acción local (Eliminar)
-  const handleAction = (id, action) => {
-    setRequests((prev) => prev.filter((r) => r.id !== id));
-
+  const handleAction = async (id, action) => {
+    // 1. Busca la solicitud
     const req = requests.find((r) => r.id === id);
-    if (req && onAction) {
-      onAction(action === "aprobado" ? "approve" : "delete", req.nombre);
+    
+    if (!req) {
+      console.error('Solicitud no encontrada');
+      return;
+    }
+    
+    try {
+      // 2. Llamada al backend para eliminar
+      if (action === "eliminado") {
+        setDeleting(id); // Mostrar estado de carga
+        await solicitudesApi.eliminarSolicitud(id);
+      }
+      
+      // 3. Ejecuta el callback
+      if (onAction) {
+        onAction(action === "aprobado" ? "approve" : "delete", req.nombre);
+      }
+      
+      // 4. Elimina del estado local
+      setRequests((prev) => prev.filter((r) => r.id !== id));
+      
+    } catch (error) {
+      console.error('Error al eliminar la solicitud:', error);
+      alert('No se pudo eliminar la solicitud. Por favor, intenta de nuevo.');
+    } finally {
+      setDeleting(null); // Quitar estado de carga
     }
   };
 
@@ -107,7 +131,7 @@ function AuthorizedList({ onAction, searchTerm = "" }) {
 
       {!loading && !error && filtered.length === 0 && (
         <div className="empty-state">
-          -
+          No hay permisos aprobados
           {searchTerm ? " que coincidan con la búsqueda." : "."}
         </div>
       )}
@@ -147,8 +171,9 @@ function AuthorizedList({ onAction, searchTerm = "" }) {
               <button
                 className="pending-delete"
                 onClick={() => handleAction(req.id, "eliminado")}
+                disabled={deleting === req.id}
               >
-                Eliminar
+                {deleting === req.id ? 'Eliminando...' : 'Eliminar'}
               </button>
             </div>
           </div>

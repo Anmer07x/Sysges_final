@@ -140,11 +140,11 @@ h1 {
 }
 
 .error-message {
-  color: #dc3545;
+  color: #ffffff;
   font-size: 0.9rem;
   margin-top: 0.5rem;
   padding: 0.5rem;
-  background-color: #f8d7da;
+  background-color: #00a46b;
   border-radius: 4px;
   animation: shake 0.5s ease-in-out;
 }

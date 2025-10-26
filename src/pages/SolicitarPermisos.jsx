@@ -100,7 +100,11 @@ const SolicitarPermisos = () => {
       'Maternidad': 2,
       'Paternidad': 3,
       'Incapacidad': 4,
-      'Otro': 5
+      // 'Luto': 5,
+      // 'Calamidad Domestica': 6,
+      // 'Lactancia': 7,
+      // 'Incapacidad Medica': 8,
+      'Otro': 9
     };
 
     // Crear la solicitud con el formato correcto
