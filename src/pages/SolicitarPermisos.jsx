@@ -21,7 +21,7 @@ const TIPOS_SOLICITUD = {
   Paternidad: { id: 3, diasDisponibles: 11 },
   Incapacidad: { id: 4, diasDisponibles: "Variable" },
   Luto: { id: 5, diasDisponibles: "Variable" },
-  CalamidadDomestica: { id: 6, diasDisponibles: "Variable" },
+  Calamidad: { id: 6, diasDisponibles: "Variable" },
   Lactancia: { id: 7, diasDisponibles: "Tiempo diario" },
   Otro: { id: 8, diasDisponibles: "Variable" },
 };
