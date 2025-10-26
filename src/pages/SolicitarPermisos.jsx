@@ -19,10 +19,11 @@ const TIPOS_SOLICITUD = {
   Vacaciones: { id: 1, diasDisponibles: 14 },
   Maternidad: { id: 2, diasDisponibles: 126 },
   Paternidad: { id: 3, diasDisponibles: 11 },
-  Incapacidad: { id: 4, diasDisponibles: 30 },
-  
-
-
+  Incapacidad: { id: 4, diasDisponibles: "Variable" },
+  Luto: { id: 5, diasDisponibles: "Variable" },
+  CalamidadDomestica: { id: 6, diasDisponibles: "Variable" },
+  Lactancia: { id: 7, diasDisponibles: "Tiempo diario" },
+  Otro: { id: 8, diasDisponibles: "Variable" },
 };
 
 const SolicitarPermisos = () => {
